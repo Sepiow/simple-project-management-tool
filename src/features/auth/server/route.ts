@@ -4,8 +4,18 @@ import {zValidator} from "@hono/zod-validator"
 import { loginSchema, registerSchema } from "../schemas";
 import {deleteCookie, setCookie} from "hono/cookie"
 import { AUTH_COOKIE } from "../constants";
+import { sessionMiddleware } from "@/lib/session-middleware";
+
 
 const app = new Hono()
+
+    .get("/current", sessionMiddleware, (c) => {
+    
+        const user = c.get("user")
+        
+        return c.json({ data: user });
+        }
+    )
 
     .post(
         "/login",
