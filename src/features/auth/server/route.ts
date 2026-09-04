@@ -21,7 +21,7 @@ const app = new Hono()
         "/login",
         zValidator("json",loginSchema),
         async (c) =>{
-        const {user_id,email,password} = c.req.valid("json")
+        const {user_id,password} = c.req.valid("json")
 
         setCookie(c, AUTH_COOKIE, JSON.stringify({ user_id }), {
         path: "/",
