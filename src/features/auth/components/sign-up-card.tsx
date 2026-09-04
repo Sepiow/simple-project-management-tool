@@ -1,4 +1,4 @@
-
+"use client"
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,6 +21,7 @@ export const SignUpCard = () => {
       } = useForm<z.infer<typeof registerSchema>>({
         resolver: zodResolver(registerSchema),
         defaultValues: {
+          user_id:"",
           email: "",
           password: "",
         },
