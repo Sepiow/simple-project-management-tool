@@ -23,8 +23,9 @@ export const useCreateProject = () => {
         },
         onSuccess: () => {
             toast.success("Project created successfully")
-            router.refresh()
+            
             queryClient.invalidateQueries({ queryKey: ["projects"] })
+            router.refresh()
         },
         onError: () => {
             toast.error("Failed to create project")

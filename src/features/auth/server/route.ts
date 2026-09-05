@@ -51,7 +51,7 @@ const app = new Hono()
         console.error("Could not fetch user email:", error);
       }
       
-      setCookie(c, AUTH_COOKIE, JSON.stringify({ user_id }), {
+      setCookie(c, AUTH_COOKIE, JSON.stringify({ user_id, ...(email ? { email } : {}) }), {
         path: "/",
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",

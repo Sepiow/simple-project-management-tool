@@ -10,16 +10,14 @@ import { createProjectSchema, type CreateProjectSchema } from "../schemas"
 import { useCreateProject } from "../api/use-create-project"
 import { DottedSeparator } from "@/components/custom/dotted-separator"
 
-interface CreateProjectFormProps {
-  onCancel?: () => void
-}
-
-export const CreateProjectForm = ({ onCancel }: CreateProjectFormProps) => {
+export const CreateProjectForm = () => {
   const { mutate, isPending } = useCreateProject()
 
   const {
     register,
     handleSubmit,
+    setValue,
+    clearErrors,
     formState: { errors }
   } = useForm<CreateProjectSchema>({
     resolver: zodResolver(createProjectSchema),
@@ -34,7 +32,9 @@ export const CreateProjectForm = ({ onCancel }: CreateProjectFormProps) => {
       { json: values },
       {
         onSuccess: () => {
-          onCancel?.()
+          setValue("name", "")
+          setValue("description", "")
+          clearErrors()
         }
       }
     )
@@ -82,17 +82,7 @@ export const CreateProjectForm = ({ onCancel }: CreateProjectFormProps) => {
             <DottedSeparator />
           </div>
 
-          <div className="flex items-center justify-between">
-            <Button
-              type="button"
-              size="lg"
-              variant="secondary"
-              onClick={onCancel}
-              disabled={isPending}
-              className={!onCancel ? "invisible" : ""}
-            >
-              Cancel
-            </Button>
+          <div className="flex items-center justify-end">
             <Button type="submit" size="lg" disabled={isPending}>
               Create Project
             </Button>
