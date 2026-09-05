@@ -1,43 +1,44 @@
-"use client";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { createWorkspaceSchema, type CreateWorkspaceSchema } from "../schemas";
-import { useCreateWorkspace } from "../api/use-create-workspace";
-import { DottedSeparator } from "@/components/custom/dotted-separator";
+"use client"
 
-interface CreateWorkspaceFormProps {
-  onCancel?: () => void;
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { createProjectSchema, type CreateProjectSchema } from "../schemas"
+import { useCreateProject } from "../api/use-create-project"
+import { DottedSeparator } from "@/components/custom/dotted-separator"
+
+interface CreateProjectFormProps {
+  onCancel?: () => void
 }
 
-export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
-  const { mutate, isPending } = useCreateWorkspace();
+export const CreateProjectForm = ({ onCancel }: CreateProjectFormProps) => {
+  const { mutate, isPending } = useCreateProject()
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<CreateWorkspaceSchema>({
-    resolver: zodResolver(createWorkspaceSchema),
+    formState: { errors }
+  } = useForm<CreateProjectSchema>({
+    resolver: zodResolver(createProjectSchema),
     defaultValues: {
       name: "",
-      description: "",
-    },
-  });
+      description: ""
+    }
+  })
 
-  const onSubmit = (values: CreateWorkspaceSchema) => {
+  const onSubmit = (values: CreateProjectSchema) => {
     mutate(
       { json: values },
       {
         onSuccess: () => {
-          onCancel?.();
-        },
+          onCancel?.()
+        }
       }
-    );
-  };
+    )
+  }
 
   return (
     <Card className="w-full h-full border-none shadow-none">
@@ -51,7 +52,6 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
       </div>
       <CardContent className="p-7">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Project Name Field */}
           <Field data-invalid={!!errors.name}>
             <FieldLabel>Project Name</FieldLabel>
             <Input
@@ -65,12 +65,11 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
             )}
           </Field>
 
-          {/* Description Field */}
           <Field data-invalid={!!errors.description}>
             <FieldLabel>Description (Optional)</FieldLabel>
             <Input
               {...register("description")}
-              placeholder="Enter workspace description"
+              placeholder="Enter project description"
               disabled={isPending}
               aria-invalid={!!errors.description}
             />
@@ -101,5 +100,5 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
         </form>
       </CardContent>
     </Card>
-  );
-};
+  )
+}
