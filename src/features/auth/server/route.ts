@@ -5,31 +5,51 @@ import { loginSchema, registerSchema } from "../schemas";
 import { AUTH_COOKIE } from "../constants";
 import { sessionMiddleware } from "@/lib/session-middleware";
 
-
-
 const app = new Hono()
   .get("/current", sessionMiddleware, (c) => {
     const user = c.get("user");
     return c.json({ data: user });
   })
 
-  .post(
+      .post(
     "/login",
     zValidator("json", loginSchema),
     async (c) => {
       const { user_id, password } = c.req.valid("json");
 
-      // connect the dowwin here remove playground later
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/testlogin`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id, password }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/testlogin`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id, password }),
+        }
+      );
 
-      if (!response.ok) {
-        return c.json({ error: "Invalid user ID or password" }, 401);
+      const result = await response.json().catch(() => null);
+
+      
+      if (!response.ok || result?.data === "Invalid Credential") {
+        return c.json({ error: "Invalid user ID or password" }, 401)
+        }
+
+        // for Email design 
+        let email = "";
+      try {
+        const membersRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test01/get_all_member`
+        );
+        const membersData = await membersRes.json();
+        if (Array.isArray(membersData?.data)) {
+          const found = membersData.data.find((m: any) => m.user_id === user_id);
+          if (found?.email) {
+            email = found.email;
+          }
+        }
+      } catch (err) {
+        console.error("Could not fetch user email:", err);
       }
-
+      
       setCookie(c, AUTH_COOKIE, JSON.stringify({ user_id }), {
         path: "/",
         httpOnly: true,
@@ -48,14 +68,18 @@ const app = new Hono()
     async (c) => {
       const { user_id, email, password } = c.req.valid("json");
 
-      // dont forget to connect the register to dowwin
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test01/create_member`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id, email, password }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test01/create_member`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id, email, password }),
+        }
+      );
 
-      if (!response.ok) {
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok || !result) {
         return c.json({ error: "Failed to create account" }, 400);
       }
 
@@ -72,7 +96,9 @@ const app = new Hono()
   )
 
   .post("/logout", (c) => {
-    deleteCookie(c, AUTH_COOKIE);
+    deleteCookie(c, AUTH_COOKIE, {
+      path: "/",
+    });
     return c.json({ success: true });
   });
 
