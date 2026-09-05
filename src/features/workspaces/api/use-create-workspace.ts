@@ -15,16 +15,16 @@ export const useCreateWorkspace = () => {
         mutationFn: async ({ json }) => {
             const response = await client.api.workspaces["$post"]({ json })
             if (!response.ok) {
-                throw new Error("Failed to make a workspace")
+                throw new Error("Failed to make a project")
             }
             return await response.json()
         },
         onSuccess: () => {
-            toast.success("Workspace made")
+            toast.success("Project made")
             queryClient.invalidateQueries({ queryKey: ["workspaces"] })
         },
         onError: ()=>{
-            toast.error("Error in creating a workspace")
+            toast.error("Error in creating a Project")
         }
 
     })

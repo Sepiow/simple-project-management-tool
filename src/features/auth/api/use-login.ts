@@ -28,7 +28,7 @@ export const useLogin = () => {
             
         },
         onError: (error)=>{
-            toast.error(error.message)
+            toast.error("Failed to login")
         },
 
     })

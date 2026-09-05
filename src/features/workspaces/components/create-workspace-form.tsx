@@ -43,7 +43,7 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
     <Card className="w-full h-full border-none shadow-none">
       <CardHeader className="flex p-7">
         <CardTitle className="text-xl font-bold">
-          Create a new workspace
+          Create a new project
         </CardTitle>
       </CardHeader>
       <div className="px-7">
@@ -51,12 +51,12 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
       </div>
       <CardContent className="p-7">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Workspace Name Field */}
+          {/* Project Name Field */}
           <Field data-invalid={!!errors.name}>
-            <FieldLabel>Workspace Name</FieldLabel>
+            <FieldLabel>Project Name</FieldLabel>
             <Input
               {...register("name")}
-              placeholder="Enter workspace name"
+              placeholder="Enter project name"
               disabled={isPending}
               aria-invalid={!!errors.name}
             />
@@ -95,7 +95,7 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
               Cancel
             </Button>
             <Button type="submit" size="lg" disabled={isPending}>
-              Create Workspace
+              Create Project
             </Button>
           </div>
         </form>

@@ -8,6 +8,7 @@ import { sessionMiddleware } from "@/lib/session-middleware";
 const app = new Hono()
   .get("/current", sessionMiddleware, (c) => {
     const user = c.get("user");
+    
     return c.json({ data: user });
   })
 
@@ -46,8 +47,8 @@ const app = new Hono()
             email = found.email;
           }
         }
-      } catch (err) {
-        console.error("Could not fetch user email:", err);
+      } catch (error) {
+        console.error("Could not fetch user email:", error);
       }
       
       setCookie(c, AUTH_COOKIE, JSON.stringify({ user_id }), {
