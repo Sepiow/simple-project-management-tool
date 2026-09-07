@@ -10,7 +10,12 @@ import { createProjectSchema, type CreateProjectSchema } from "../schemas"
 import { useCreateProject } from "../api/use-create-project"
 import { DottedSeparator } from "@/components/custom/dotted-separator"
 
-export const CreateProjectForm = () => {
+
+interface CreateProjectFormProps {
+  onCancel?: () => void
+}
+
+export const CreateProjectForm = ({onCancel}:CreateProjectFormProps) => {
   const { mutate, isPending } = useCreateProject()
 
   const {
@@ -35,6 +40,7 @@ export const CreateProjectForm = () => {
           setValue("name", "")
           setValue("description", "")
           clearErrors()
+          onCancel?.()
         }
       }
     )
@@ -82,7 +88,16 @@ export const CreateProjectForm = () => {
             <DottedSeparator />
           </div>
 
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-between">
+            <Button
+              type="button"
+              size="lg"
+              variant="secondary"
+              onClick={onCancel}
+              disabled={isPending}
+              className={onCancel ? "block" : "invisible"}>
+            Cancel
+            </Button>
             <Button type="submit" size="lg" disabled={isPending}>
               Create Project
             </Button>

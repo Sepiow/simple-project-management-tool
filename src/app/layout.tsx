@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import {QueryProvider} from "@/components/query-provider";
 import {Toaster} from "@/components/ui/sonner";
 
+import { NuqsAdapter } from "nuqs/adapters/next/app"
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -32,7 +33,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         <Toaster />
         <QueryProvider>
+          <NuqsAdapter>
           {children}
+          </NuqsAdapter>
         </QueryProvider>
         
 
