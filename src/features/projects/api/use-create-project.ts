@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import { client } from "@/lib/rpc"
 import { toast } from "sonner"
 
-type ResponseType = InferResponseType<typeof client.api.projects["$post"]>
+type ResponseType = InferResponseType<typeof client.api.projects["$post"],200>
 type RequestType = InferRequestType<typeof client.api.projects["$post"]>
 
 export const useCreateProject = () => {
@@ -21,10 +21,16 @@ export const useCreateProject = () => {
 
             return await response.json()
         },
-        onSuccess: () => {
+        onSuccess: ({ data }) => {
             toast.success("Project created successfully")
             
             queryClient.invalidateQueries({ queryKey: ["projects"] })
+            const projectId = data?.id ?? (typeof data === "number" || typeof data === "string" ? data : null)
+            if (projectId) {
+              router.push(`/projects/${projectId}`)
+            } else {
+              router.push("/")
+            }
             router.refresh()
         },
         onError: () => {

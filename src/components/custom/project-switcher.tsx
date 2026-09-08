@@ -40,7 +40,7 @@ export const ProjectSwitcher = () => {
           />
       </div>
 
-      <Select onValueChange={onSelect} value={projectId}>
+      <Select onValueChange={onSelect} value={projectId ? String(projectId) : ""}>
         <SelectTrigger className="w-full bg-neutral-200 font-medium p-1">
           {/*Select avatar pic and name*/}
           <SelectValue placeholder="No project selected">

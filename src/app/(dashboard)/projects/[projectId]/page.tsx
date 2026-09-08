@@ -1,5 +1,9 @@
 import { redirect } from "next/navigation"
+import Link from "next/link"
 import { getCurrent } from "@/features/auth/queries"
+import { getProject } from "@/features/projects/queries"
+import { Button } from "@/components/ui/button"
+import { PencilIcon } from "lucide-react"
 
 interface ProjectIdPageProps {
   params: Promise<{
@@ -12,12 +16,7 @@ export default async function ProjectIdPage({ params }: ProjectIdPageProps) {
   if (!user) redirect("/sign-in")
 
   const { projectId } = await params
-
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test02/get_project?id=${projectId}`
-  )
-  const result = await response.json().catch(() => null)
-  const project = result?.data
+  const project = await getProject({ projectId })
 
   if (!project) {
     redirect("/")
@@ -26,8 +25,17 @@ export default async function ProjectIdPage({ params }: ProjectIdPageProps) {
   return (
     <div className="flex flex-col gap-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{project.name}</h1>
-        <p className="text-sm text-neutral-500">{project.description}</p>
+        <div>
+          <h1 className="text-2xl font-bold">{project.name}</h1>
+          <p className="text-sm text-neutral-500">{project.description}</p>
+        </div>
+
+        <Link href={`/projects/${projectId}/settings`}>
+          <Button variant="secondary" size="sm">
+            <PencilIcon className="size-4 mr-2" />
+            Edit Project
+          </Button>
+        </Link>
       </div>
 
       <div className="bg-white p-6 rounded-lg border">
