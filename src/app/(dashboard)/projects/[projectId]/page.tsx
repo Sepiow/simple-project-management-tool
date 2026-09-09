@@ -5,6 +5,8 @@ import { getProject } from "@/features/projects/queries"
 import { Button } from "@/components/ui/button"
 import { PencilIcon } from "lucide-react"
 
+import { TaskViewSwitcher } from "@/features/tasks/components/task-view-switcher"
+
 interface ProjectIdPageProps {
   params: Promise<{
     projectId: string
@@ -38,9 +40,8 @@ export default async function ProjectIdPage({ params }: ProjectIdPageProps) {
         </Link>
       </div>
 
-      <div className="bg-white p-6 rounded-lg border">
-        <p className="text-neutral-500">Tasks placeholder.</p>
-      </div>
+     <TaskViewSwitcher /> 
+    
     </div>
   )
 }
