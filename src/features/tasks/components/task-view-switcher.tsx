@@ -66,9 +66,7 @@ export const TaskViewSwitcher = ({ hideProjectFilter }: TaskViewSwitcherProps) =
             <TabsTrigger className="h-8 w-full lg:w-auto" value="kanban">
               Kanban
             </TabsTrigger>
-            <TabsTrigger className="h-8 w-full lg:w-auto" value="calendar">
-              Calendar
-            </TabsTrigger>
+            
           </TabsList>
 
           <Button onClick={() => open()} size="sm" className="w-full lg:w-auto">
@@ -104,11 +102,7 @@ export const TaskViewSwitcher = ({ hideProjectFilter }: TaskViewSwitcherProps) =
               />
             </TabsContent>
 
-            <TabsContent value="calendar" className="mt-0">
-              <div className="p-4 text-neutral-500 text-sm">
-                Calendar view component will render here.
-              </div>
-            </TabsContent>
+            
           </>
         )}
       </div>

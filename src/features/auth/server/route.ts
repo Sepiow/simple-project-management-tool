@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { deleteCookie, setCookie } from "hono/cookie";
-import { loginSchema, registerSchema } from "../schemas";
+import { loginSchema, registerSchema,updateMemberSchema } from "../schemas";
 import { AUTH_COOKIE } from "../constants";
 import { sessionMiddleware } from "@/lib/session-middleware";
 
@@ -95,6 +95,46 @@ const app = new Hono()
       return c.json({ success: true });
     }
   )
+    // update user profile & password
+  .patch(
+    "/update-member",
+    sessionMiddleware,
+    zValidator("json", updateMemberSchema),
+    async (c) => {
+      const { user_id, email, old_password, new_password } = c.req.valid("json");
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test01/update_member`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id,
+            email,
+            old_password,
+            new_password,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Dowinnsys update_member error:", response.status, errorText);
+        return c.json({ error: errorText || "Failed to update profile" }, 400);
+      }
+
+      // update session cookie with the latest email
+      setCookie(c, AUTH_COOKIE, JSON.stringify({ user_id, email }), {
+        path: "/",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 * 7,
+      });
+
+      return c.json({ success: true, data: { user_id, email } });
+    }
+  )
 
   .post("/logout", (c) => {
     deleteCookie(c, AUTH_COOKIE, {
@@ -103,4 +143,5 @@ const app = new Hono()
     return c.json({ success: true });
   });
 
+  
 export default app;
