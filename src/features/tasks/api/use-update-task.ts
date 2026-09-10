@@ -26,6 +26,10 @@ export const useUpdateTask = () => {
       toast.success("Task updated")
       queryClient.invalidateQueries({ queryKey: ["tasks"] })
       queryClient.invalidateQueries({ queryKey: ["task", data.id] })
+      // need this to make update changelogs live
+      queryClient.invalidateQueries({ queryKey: ["task", String(data.id)] })
+      queryClient.invalidateQueries({ queryKey: ["task-changelogs"] })
+      queryClient.invalidateQueries({ queryKey: ["task-changelogs", String(data.id)] })
     },
     onError: () => {
       toast.error("Failed to update task")

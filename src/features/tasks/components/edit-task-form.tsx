@@ -11,6 +11,11 @@ import { DottedSeparator } from "@/components/custom/dotted-separator"
 import { createTaskSchema, type CreateTaskSchema } from "../schemas"
 import { useUpdateTask } from "../api/use-update-task"
 import { Task, TaskStatus } from "../types"
+import { useGetChangelogs } from "../api/use-get-changelogs"
+import { HistoryIcon, Loader } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { format } from "date-fns"
+
 
 interface EditTaskFormProps {
   onCancel?: () => void
@@ -54,6 +59,11 @@ export const EditTaskForm = ({
       }
     )
   }
+
+    // for getting change logs 
+  const { data: changelogs, isLoading: isLoadingLogs } = useGetChangelogs({
+    taskId: String(initialValues.id)
+  })
 
   return (
     <Card className="w-full h-full border-none shadow-none">
@@ -111,6 +121,54 @@ export const EditTaskForm = ({
 
           <div className="py-2">
             <DottedSeparator />
+          </div>
+        
+            {/* Change Log Section */}
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center gap-x-2 text-sm font-semibold text-neutral-700">
+              <HistoryIcon className="size-4" />
+              <span>Change History</span>
+            </div>
+
+            {isLoadingLogs ? (
+              <div className="flex items-center justify-center p-4">
+                <Loader className="size-4 animate-spin text-muted-foreground" />
+              </div>
+            ) : changelogs && changelogs.length > 0 ? (
+              <div className="space-y-2 max-h-40 overflow-y-auto rounded-md border p-3 bg-neutral-50/50">
+                {changelogs.map((log: any, index: number) => (
+                  <div
+                    key={log.id || index}
+                    className="flex flex-col gap-y-1 text-xs border-b last:border-0 pb-2 last:pb-0"
+                  >
+                    <div className="flex items-center gap-x-1.5 flex-wrap">
+                      <span className="text-muted-foreground">Status changed:</span>
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                        {log.old_status || log.oldStatus}
+                      </Badge>
+                      <span className="text-muted-foreground">→</span>
+                      <Badge variant="default" className="text-[10px] px-1.5 py-0">
+                        {log.new_status || log.newStatus}
+                      </Badge>
+                    </div>
+                    {log.remark && (
+                      <span className="text-neutral-500 italic text-[11px]">
+                        {log.remark}
+                      </span>
+                    )}
+                    {log.created_at && (
+                      <span className="text-[10px] text-muted-foreground">
+                        {format(new Date(log.created_at), "MMM d, yyyy h:mm a")}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground italic">
+                No status changes recorded yet.
+              </p>
+            )}
           </div>
 
           <div className="flex items-center justify-between">

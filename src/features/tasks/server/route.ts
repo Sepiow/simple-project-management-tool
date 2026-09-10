@@ -150,7 +150,7 @@ const app = new Hono()
   )  
   
 
-    // edit/update task
+    // edit/update task & create_changelog
   .patch(
     "/:taskId",
     sessionMiddleware,
@@ -163,36 +163,31 @@ const app = new Hono()
     async (c) => {
       const { taskId } = c.req.param()
       let { name, status, contents } = c.req.valid("json")
-
-      // if name or contents is missing make it
-      // fetch the existing task based on format
-      if (!name || contents === undefined) {
-        try {
-          const getRes = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test03/get_task?id=${taskId}`
-          )
-          if (getRes.ok) {
-            const getJson = await getRes.json()
-            const existing = getJson?.data ?? getJson
-            if (!name && existing?.name) name = existing.name
-            if (contents === undefined && existing?.contents !== undefined) {
-              contents = existing.contents
-            }
-            if (!status && existing?.status) status = existing.status
-          }
-        } catch (err) {
-          console.error("Failed to fetch existing task fallback:", err)
+      // 1. Fetch existing task to compare status & provide fallbacks
+      let existingTask: any = null
+      try {
+        const getRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test03/get_task?id=${taskId}`,
+          { cache: "no-store" }
+        )
+        if (getRes.ok) {
+          const getJson = await getRes.json()
+          existingTask = getJson?.data ?? getJson
         }
+      } catch (err) {
+        console.error("Failed to fetch existing task fallback:", err)
       }
-
-      // make sure the format is correct
+      const oldStatus = existingTask?.status || "Todo"
+      const currentName = name || existingTask?.name || "Untitled Task"
+      const currentContents = contents !== undefined ? contents : (existingTask?.contents || "")
+      const newStatus = status || oldStatus
+      // 2. Patch the task in Dowinnsys Test03
       const payload = {
         task_id: Number(taskId),
-        name: name || "Untitled Task",
-        status: status || "Todo",
-        contents: contents ?? ""
+        name: currentName,
+        status: newStatus,
+        contents: currentContents
       }
-
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test03/patch_task`,
         {
@@ -201,13 +196,32 @@ const app = new Hono()
           body: JSON.stringify(payload)
         }
       )
-
       if (!response.ok) {
         const errorText = await response.text()
         console.error("Dowinnsys patch_task error:", response.status, errorText)
         return c.json({ error: errorText || "Failed to update task" }, 400)
       }
-
+      // 3. If status changed, automatically record to Dowinnsys Test04 ChangeLog!
+      if (oldStatus !== newStatus) {
+        try {
+          await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test04/create_changelog`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                task_id: Number(taskId),
+                old_status: oldStatus,
+                new_status: newStatus,
+                remark: `Status changed from ${oldStatus} to ${newStatus}`
+              })
+            }
+          )
+          console.log(`ChangeLog created for task ${taskId}: ${oldStatus} -> ${newStatus}`)
+        } catch (logErr) {
+          console.error("Failed to create changelog:", logErr)
+        }
+      }
       return c.json({
         data: {
           id: Number(taskId),
@@ -216,6 +230,32 @@ const app = new Hono()
           contents: payload.contents
         }
       })
+    }
+  )
+    // get changelogs for a specific task
+  .get(
+    "/:taskId/changelogs",
+    sessionMiddleware,
+    async (c) => {
+      const { taskId } = c.req.param()
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test04/get_all_change_log`,
+        { cache: "no-store" }
+      )
+      if (!response.ok) {
+        return c.json({ data: [] })
+      }
+      const result = await response.json()
+      const allLogs = Array.isArray(result?.data)
+        ? result.data
+        : Array.isArray(result)
+        ? result
+        : []
+      // Filter logs belonging to this task
+      const taskLogs = allLogs.filter(
+        (log: any) => String(log.task_id || log.taskId) === String(taskId)
+      )
+      return c.json({ data: taskLogs })
     }
   )
 export default app
