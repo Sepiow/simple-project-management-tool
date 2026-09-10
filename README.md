@@ -84,7 +84,7 @@ pnpm install
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # Dowinnsys Backend API Base URL
-NEXT_PUBLIC_BACKEND_API_URL=https://your-dowinnsys-api-url.com
+Via discord
 ```
 ### 4. Run the Development Server
 ```bash
