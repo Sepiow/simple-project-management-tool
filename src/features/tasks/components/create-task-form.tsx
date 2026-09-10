@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DottedSeparator } from "@/components/custom/dotted-separator"
-import { DatePicker } from "@/components/custom/date-picker"
+import { useEffect } from "react"
 import { createTaskSchema, type CreateTaskSchema } from "../schemas"
 import { useCreateTask } from "../api/use-create-task"
 import { useGetProjects } from "@/features/projects/api/use-get-projects"
@@ -24,6 +24,8 @@ interface CreateTaskFormProps {
 export const CreateTaskForm = ({
   onCancel,
   initialStatus
+
+  
 }: CreateTaskFormProps) => {
   const currentProjectId = useProjectId()
   const { data: projectsData } = useGetProjects()
@@ -43,7 +45,7 @@ export const CreateTaskForm = ({
       name: "",
       status: initialStatus || TaskStatus.TODO,
       projectId: currentProjectId || "",
-      description: ""
+      contents: ""
     }
   })
 
@@ -65,6 +67,12 @@ export const CreateTaskForm = ({
       }
     )
   }
+
+  useEffect(() => {
+    if (initialStatus) {
+      setValue("status", initialStatus)
+    }
+  }, [initialStatus, setValue])
 
   return (
     <Card className="w-full h-full border-none shadow-none">
@@ -93,16 +101,7 @@ export const CreateTaskForm = ({
             )}
           </Field>
 
-          <Field data-invalid={!!errors.dueDate}>
-            <FieldLabel>Due Date</FieldLabel>
-            <DatePicker
-              value={dueDate}
-              onChange={(date) => setValue("dueDate", date)}
-            />
-            {errors.dueDate?.message && (
-              <FieldError>{errors.dueDate.message}</FieldError>
-            )}
-          </Field>
+          
 
             <Field data-invalid={!!errors.projectId}>
             <FieldLabel>Project</FieldLabel>
@@ -158,16 +157,16 @@ export const CreateTaskForm = ({
             )}
           </Field>
 
-          <Field data-invalid={!!errors.description}>
-            <FieldLabel>Description (Optional)</FieldLabel>
+          <Field data-invalid={!!errors.contents}>
+            <FieldLabel>contents (Optional)</FieldLabel>
             <Input
-              {...register("description")}
-              placeholder="Enter task description"
+              {...register("contents")}
+              placeholder="Enter task contents"
               disabled={isPending}
-              aria-invalid={!!errors.description}
+              aria-invalid={!!errors.contents}
             />
-            {errors.description?.message && (
-              <FieldError>{errors.description.message}</FieldError>
+            {errors.contents?.message && (
+              <FieldError>{errors.contents.message}</FieldError>
             )}
           </Field>
 

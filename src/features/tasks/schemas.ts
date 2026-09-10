@@ -10,7 +10,7 @@ export const createTaskSchema = z.object({
   ], { message: "Status is required" }),
   projectId: z.string().trim().min(1, "Project is required"),
   dueDate: z.union([z.date(), z.string()]).optional(),
-  description: z.string().optional()
+  contents: z.string().optional()
 })
 
 export type CreateTaskSchema = z.infer<typeof createTaskSchema>

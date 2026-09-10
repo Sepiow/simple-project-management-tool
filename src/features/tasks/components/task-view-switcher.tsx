@@ -11,6 +11,13 @@ import { useProjectId } from "@/features/projects/hooks/use-project-id"
 import { useTaskFilters } from "../hooks/use-task-filters"
 import { DataFilters } from "./data-filters"
 
+import { columns } from "./columns"
+import { DataTable } from "./data-table"
+
+import { DataKanban } from "./data-kanban"
+import { useUpdateTask } from "../api/use-update-task"
+import { TaskStatus } from "../types"
+
 interface TaskViewSwitcherProps {
   hideProjectFilter?: boolean
 }
@@ -30,6 +37,19 @@ export const TaskViewSwitcher = ({ hideProjectFilter }: TaskViewSwitcherProps) =
     search,
     dueDate
   })
+
+   const { mutate: updateTask } = useUpdateTask()
+  const onKanbanChange = (
+    tasks: { id: number | string; status: TaskStatus; position: number }[]
+  ) => {
+    
+    tasks.forEach((task) => {
+      updateTask({
+        param: { taskId: String(task.id) },
+        json: { status: task.status }
+      })
+    })
+  }
 
   return (
     <Tabs
@@ -51,10 +71,10 @@ export const TaskViewSwitcher = ({ hideProjectFilter }: TaskViewSwitcherProps) =
             </TabsTrigger>
           </TabsList>
 
-          <Button onClick={open} size="sm" className="w-full lg:w-auto">
+          <Button onClick={() => open()} size="sm" className="w-full lg:w-auto">
             <PlusIcon className="size-4 mr-2" />
             New
-          </Button>
+           </Button>
         </div>
 
         <div className="my-4">
@@ -74,15 +94,14 @@ export const TaskViewSwitcher = ({ hideProjectFilter }: TaskViewSwitcherProps) =
         ) : (
           <>
             <TabsContent value="table" className="mt-0">
-              <div className="p-4 text-neutral-500 text-sm">
-                Table view component will render here (found {tasks?.total || 0} tasks).
-              </div>
+               <DataTable columns={columns} data={tasks?.documents ?? []} />
             </TabsContent>
 
             <TabsContent value="kanban" className="mt-0">
-              <div className="p-4 text-neutral-500 text-sm">
-                Kanban board component will render here.
-              </div>
+              <DataKanban
+                onChange={onKanbanChange}
+                data={tasks?.documents ?? []}
+              />
             </TabsContent>
 
             <TabsContent value="calendar" className="mt-0">
