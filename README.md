@@ -97,7 +97,7 @@ To bootstrap the backend database with sample projects, tasks across different s
 
 Via cURL / POST request:
 bash
-
+```
 
 curl -X POST http://localhost:3000/api/init \
   -H "Content-Type: application/json" \
@@ -106,9 +106,9 @@ Or via Browser:
 Navigate directly to:
 
 http://localhost:3000/api/init
+```
 
-
-⚠️ Known Issues & Technical Considerations
+## ⚠️ Known Issues & Technical Considerations
 First-Time Account Project Creation & Immediate Redirect:
 
 Behavior: When a brand-new user registers and creates their very first project, the project is created successfully on the backend, but the client may not immediately redirect to that specific project view until the user selects it from the switcher or refreshes the page.
