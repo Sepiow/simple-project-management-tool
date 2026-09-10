@@ -9,9 +9,7 @@ This application provides a workspace where teams can manage multi-project workf
 ## 🚀 Live Demo & Deployed Version
 
 - **Deployed URL (Vercel)**: [https://simple-project-management-tool-beryl.vercel.app/sign-up)](https://simple-project-management-tool-beryl.vercel.app/sign-up)
-- **Default Test User**:
-  - **User ID**: `demo_user`
-  - **Password**: `Password123!`
+
 
 > **Security Note**: Any production API keys, test credentials, and environment secrets are shared securely via **Discord** directly.
 
