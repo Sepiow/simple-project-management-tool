@@ -69,6 +69,11 @@ export const DataKanban = ({ data, onChange }: DataKanbanProps) => {
       const sourceStatus = source.droppableId as TaskStatus
       const destStatus = destination.droppableId as TaskStatus
 
+      
+      if (sourceStatus === destStatus && source.index === destination.index) {
+        return
+      }
+
       let updatesPayload: {
         id: number | string
         status: TaskStatus
@@ -78,7 +83,6 @@ export const DataKanban = ({ data, onChange }: DataKanbanProps) => {
       setTasks((prevTasks) => {
         const newTasks = { ...prevTasks }
 
-        // Safely extract source column
         const sourceColumn = [...newTasks[sourceStatus]]
         const [movedTask] = sourceColumn.splice(source.index, 1)
 
@@ -99,13 +103,16 @@ export const DataKanban = ({ data, onChange }: DataKanbanProps) => {
         destColumn.splice(destination.index, 0, updatedMovedTask)
         newTasks[destStatus] = destColumn
 
-        updatesPayload = [
-          {
-            id: updatedMovedTask.id,
-            status: destStatus,
-            position: Math.min((destination.index + 1) * 1000, 1_000_000)
-          }
-        ]
+        // status change
+        if (sourceStatus !== destStatus) {
+          updatesPayload = [
+            {
+              id: updatedMovedTask.id,
+              status: destStatus,
+              position: Math.min((destination.index + 1) * 1000, 1_000_000)
+            }
+          ]
+        }
 
         return newTasks
       })

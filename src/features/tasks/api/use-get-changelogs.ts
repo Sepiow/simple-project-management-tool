@@ -6,18 +6,27 @@ interface UseGetChangelogsProps {
 
 export const useGetChangelogs = ({ taskId }: UseGetChangelogsProps) => {
   const query = useQuery({
-    queryKey: ["task-changelogs", taskId],
+    queryKey: ["task-changelogs", String(taskId)],
     queryFn: async () => {
-      const response = await fetch(`/api/tasks/${taskId}/changelogs`)
+      const response = await fetch(`/api/tasks/${taskId}/changelogs`, {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+          "Pragma": "no-cache"
+        }
+      })
 
       if (!response.ok) {
-        throw new Error("Failed to fetch changelogs")
+        return []
       }
 
       const { data } = await response.json()
-      return data
+      return Array.isArray(data) ? data : data ? [data] : []
     },
-    enabled: !!taskId
+    enabled: !!taskId,
+    staleTime: 0,
+    refetchInterval: 1000,
+    refetchOnWindowFocus: true
   })
 
   return query

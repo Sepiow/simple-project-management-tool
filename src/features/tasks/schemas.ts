@@ -9,7 +9,6 @@ export const createTaskSchema = z.object({
     TaskStatus.DONE
   ], { message: "Status is required" }),
   projectId: z.string().trim().min(1, "Project is required"),
-  dueDate: z.union([z.date(), z.string()]).optional(),
   contents: z.string().optional()
 })
 
@@ -22,8 +21,7 @@ export const getTasksSchema = z.object({
     TaskStatus.IN_PROGRESS,
     TaskStatus.DONE
   ]).nullish(),
-  search: z.string().nullish(),
-  dueDate: z.string().nullish()
+  search: z.string().nullish()
 })
 
 export type GetTasksSchema = z.infer<typeof getTasksSchema>

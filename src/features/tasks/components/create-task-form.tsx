@@ -24,8 +24,6 @@ interface CreateTaskFormProps {
 export const CreateTaskForm = ({
   onCancel,
   initialStatus
-
-  
 }: CreateTaskFormProps) => {
   const currentProjectId = useProjectId()
   const { data: projectsData } = useGetProjects()
@@ -49,7 +47,6 @@ export const CreateTaskForm = ({
     }
   })
 
-  const dueDate = watch("dueDate")
   const selectedStatus = watch("status")
   const selectedProjectId = watch("projectId")
 
@@ -101,9 +98,7 @@ export const CreateTaskForm = ({
             )}
           </Field>
 
-          
-
-            <Field data-invalid={!!errors.projectId}>
+          <Field data-invalid={!!errors.projectId}>
             <FieldLabel>Project</FieldLabel>
             <Select
               value={selectedProjectId}
