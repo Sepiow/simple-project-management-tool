@@ -95,18 +95,8 @@ npm run dev
 🗄️ Database Initialization (Pre-defined Dataset)
 To bootstrap the backend database with sample projects, tasks across different statuses, and initial change logs, trigger the initialization endpoint:
 
-Via cURL / POST request:
-bash
-```
+Via cURL / POST request: sent via discord
 
-curl -X POST http://localhost:3000/api/init \
-  -H "Content-Type: application/json" \
-  -d '{"user_id": "demo_user", "email": "demo@example.com", "password": "Password123!"}'
-Or via Browser:
-Navigate directly to:
-
-http://localhost:3000/api/init
-```
 
 ## ⚠️ Known Issues & Technical Considerations
 First-Time Account Project Creation & Immediate Redirect:
