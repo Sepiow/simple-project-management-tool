@@ -1,17 +1,16 @@
-import { getCurrent } from "@/features/auth/queries"
-import { getProjects } from "@/features/projects/queries"
-import { redirect } from "next/navigation"
-import { EmptyDashboard } from "@/features/tasks/components/empty-dashboard"
+import { getCurrent } from "@/features/auth/queries";
+import { redirect } from "next/navigation";
+import { EditProfileCard } from "@/features/auth/components/edit-profile-card";
 
-export default async function Home() {
-  const user = await getCurrent()
-  if (!user) redirect("/sign-in")
+export const dynamic = "force-dynamic";
 
-  const projects = await getProjects()
+export default async function SettingsPage() {
+  const user = await getCurrent();
+  if (!user) redirect("/sign-in");
 
-  if (projects.total > 0) {
-    redirect(`/projects/${projects.documents[0].id}`)
-  }
-
-  return <EmptyDashboard />
+  return (
+    <div className="w-full lg:max-w-xl mx-auto py-6">
+      <EditProfileCard />
+    </div>
+  );
 }

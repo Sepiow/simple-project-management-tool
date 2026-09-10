@@ -7,6 +7,8 @@ import { PencilIcon } from "lucide-react"
 
 import { TaskViewSwitcher } from "@/features/tasks/components/task-view-switcher"
 
+export const dynamic = "force-dynamic"
+
 interface ProjectIdPageProps {
   params: Promise<{
     projectId: string
@@ -40,8 +42,7 @@ export default async function ProjectIdPage({ params }: ProjectIdPageProps) {
         </Link>
       </div>
 
-     <TaskViewSwitcher /> 
-    
+      <TaskViewSwitcher /> 
     </div>
   )
 }
