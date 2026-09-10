@@ -16,17 +16,18 @@ export const useRegister = () => {
         mutationFn: async ({ json }) => {
             const response = await client.api.auth.register["$post"]({ json })
             if (!response.ok) {
-                throw new Error("Failed to register")
+                const errData = await response.json().catch(() => null)
+                throw new Error((errData as any)?.error || "Failed to create account")
             }
             return await response.json()
         },
         onSuccess: () => {
-            toast.success("Account created")
+            toast.success("Account created successfully")
             router.refresh()
             queryClient.invalidateQueries({ queryKey: ["current"] })
         },
-        onError:()=>{
-            toast.error("Failed to register an account")
+        onError: (error) => {
+            toast.error(error.message || "Failed to register an account")
         }
     })
 

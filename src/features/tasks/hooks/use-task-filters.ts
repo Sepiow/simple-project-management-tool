@@ -5,7 +5,6 @@ export const useTaskFilters = () => {
   return useQueryStates({
     projectId: parseAsString,
     status: parseAsStringEnum(Object.values(TaskStatus)),
-    search: parseAsString,
-    dueDate: parseAsString
+    search: parseAsString
   })
 }

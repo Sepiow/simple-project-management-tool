@@ -9,15 +9,17 @@ import { Button } from "@/components/ui/button"
 import { createProjectSchema, type CreateProjectSchema } from "../schemas"
 import { useCreateProject } from "../api/use-create-project"
 import { DottedSeparator } from "@/components/custom/dotted-separator"
-
+import { useRouter } from "next/navigation"
 
 interface CreateProjectFormProps {
   onCancel?: () => void
 }
 
+
+
 export const CreateProjectForm = ({onCancel}:CreateProjectFormProps) => {
   const { mutate, isPending } = useCreateProject()
-
+  const router = useRouter()
   const {
     register,
     handleSubmit,
@@ -36,11 +38,14 @@ export const CreateProjectForm = ({onCancel}:CreateProjectFormProps) => {
     mutate(
       { json: values },
       {
-        onSuccess: () => {
+        onSuccess: ({ data }) => {
           setValue("name", "")
           setValue("description", "")
           clearErrors()
           onCancel?.()
+          if (data?.id) {
+            router.push(`/projects/${data.id}`)
+          }
         }
       }
     )

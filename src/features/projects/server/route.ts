@@ -87,8 +87,12 @@ const app = new Hono()
       if (!response.ok) {
         return c.json({ error: "Failed to create project" }, 400)
       }
-
-      //user projects to get the for new created project with the ID
+      const result = await response.json().catch(() => null)
+      const directId = result?.data?.id ?? result?.id ?? (typeof result?.data === "number" ? result.data : null)
+      if (directId) {
+        return c.json({ data: { id: directId, name } })
+      }
+      // fallback to get the latest project with matching user/name
       const allProjectsRes = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test02/get_all_project`,
         { cache: "no-store" }
@@ -99,12 +103,10 @@ const app = new Hono()
         : Array.isArray(allProjectsData)
         ? allProjectsData
         : []
-
-      // get  latest project with matching name/user
-      const createdProject = allProjects
-        .filter((p: any) => p.name === name)
-        .slice(-1)[0] || { id: null, name }
-
+      const matchingProjects = allProjects.filter(
+        (p: any) => p.name === name && String(p.user_id) === String(user.user_id)
+      )
+      const createdProject = matchingProjects.slice(-1)[0] || allProjects.slice(-1)[0]
       return c.json({ data: createdProject })
     }
   )

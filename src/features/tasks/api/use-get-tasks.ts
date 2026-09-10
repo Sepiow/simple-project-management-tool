@@ -6,14 +6,12 @@ interface UseGetTasksProps {
   projectId?: string | null
   status?: TaskStatus | null
   search?: string | null
-  dueDate?: string | null
 }
 
 export const useGetTasks = ({
   projectId,
   status,
-  search,
-  dueDate
+  search
 }: UseGetTasksProps) => {
   const query = useQuery({
     queryKey: [
@@ -21,8 +19,7 @@ export const useGetTasks = ({
       {
         projectId,
         status,
-        search,
-        dueDate
+        search
       }
     ],
     queryFn: async () => {
@@ -30,8 +27,7 @@ export const useGetTasks = ({
         query: {
           projectId: projectId ?? undefined,
           status: status ?? undefined,
-          search: search ?? undefined,
-          dueDate: dueDate ?? undefined
+          search: search ?? undefined
         }
       })
 
