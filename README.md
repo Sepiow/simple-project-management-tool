@@ -8,7 +8,7 @@ This application provides a workspace where teams can manage multi-project workf
 
 ## 🚀 Live Demo & Deployed Version
 
-- **Deployed URL (Vercel)**: `https://your-deployed-project-url.vercel.app` *(Replace with your Vercel URL)*
+- **Deployed URL (Vercel)**:
 - **Default Test User**:
   - **User ID**: `demo_user`
   - **Password**: `Password123!`
