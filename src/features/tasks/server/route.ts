@@ -163,7 +163,7 @@ const app = new Hono()
     async (c) => {
       const { taskId } = c.req.param()
       let { name, status, contents } = c.req.valid("json")
-      // 1. Fetch existing task to compare status & provide fallbacks
+      // get the existing task to compare status & provide fallbacks
       let existingTask: any = null
       try {
         const getRes = await fetch(
@@ -181,7 +181,7 @@ const app = new Hono()
       const currentName = name || existingTask?.name || "Untitled Task"
       const currentContents = contents !== undefined ? contents : (existingTask?.contents || "")
       const newStatus = status || oldStatus
-      // 2. Patch the task in Dowinnsys Test03
+      // use the patchtask 
       const payload = {
         task_id: Number(taskId),
         name: currentName,
@@ -201,7 +201,7 @@ const app = new Hono()
         console.error("Dowinnsys patch_task error:", response.status, errorText)
         return c.json({ error: errorText || "Failed to update task" }, 400)
       }
-      // 3. If status changed, automatically record to Dowinnsys Test04 ChangeLog!
+      // if status changed use create changelog
       if (oldStatus !== newStatus) {
         try {
           await fetch(
@@ -234,28 +234,19 @@ const app = new Hono()
   )
     // get changelogs for a specific task
   .get(
-    "/:taskId/changelogs",
+    "/changelogs/:logId",
     sessionMiddleware,
     async (c) => {
-      const { taskId } = c.req.param()
+      const { logId } = c.req.param()
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test04/get_all_change_log`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test04/get_change_log?id=${logId}`,
         { cache: "no-store" }
       )
       if (!response.ok) {
-        return c.json({ data: [] })
+        return c.json({ error: "Change log not found" }, 404)
       }
       const result = await response.json()
-      const allLogs = Array.isArray(result?.data)
-        ? result.data
-        : Array.isArray(result)
-        ? result
-        : []
-      // Filter logs belonging to this task
-      const taskLogs = allLogs.filter(
-        (log: any) => String(log.task_id || log.taskId) === String(taskId)
-      )
-      return c.json({ data: taskLogs })
+      return c.json({ data: result?.data ?? result })
     }
   )
 export default app
