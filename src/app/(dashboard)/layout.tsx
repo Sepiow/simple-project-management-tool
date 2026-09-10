@@ -5,6 +5,8 @@ import { Sidebar } from "@/components/custom/sidebar";
 import { CreateTaskModal } from "@/features/tasks/components/create-task-modal";
 import { EditTaskModal } from "@/features/tasks/components/edit-task-modal";
 
+export const dynamic = "force-dynamic";
+
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
@@ -19,13 +21,19 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       </Suspense>
       <div className="flex w-full h-full">
         <div className="fixed left-0 top-0 hidden lg:block lg:w-66 h-full overflow-y-auto">
-          <Sidebar />
+          <Suspense fallback={null}>
+            <Sidebar />
+          </Suspense>
         </div>
         <div className="lg:pl-66 w-full">
           <div className="mx-auto max-w-screen-2xl h-full">
-            <Navbar />
+            <Suspense fallback={null}>
+              <Navbar />
+            </Suspense>
             <main className="h-full py-8 px-6 flex flex-col">
-              {children}
+              <Suspense fallback={null}>
+                {children}
+              </Suspense>
             </main>
           </div>
         </div>

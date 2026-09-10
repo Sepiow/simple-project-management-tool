@@ -1,16 +1,24 @@
-import { getCurrent } from "@/features/auth/queries";
-import { redirect } from "next/navigation";
-import { EditProfileCard } from "@/features/auth/components/edit-profile-card";
+import { Suspense } from "react"
+import { getCurrent } from "@/features/auth/queries"
+import { getProjects } from "@/features/projects/queries"
+import { redirect } from "next/navigation"
+import { EmptyDashboard } from "@/features/tasks/components/empty-dashboard"
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"
 
-export default async function SettingsPage() {
-  const user = await getCurrent();
-  if (!user) redirect("/sign-in");
+export default async function Home() {
+  const user = await getCurrent()
+  if (!user) redirect("/sign-in")
+
+  const projects = await getProjects()
+
+  if (projects.total > 0) {
+    redirect(`/projects/${projects.documents[0].id}`)
+  }
 
   return (
-    <div className="w-full lg:max-w-xl mx-auto py-6">
-      <EditProfileCard />
-    </div>
-  );
+    <Suspense fallback={null}>
+      <EmptyDashboard />
+    </Suspense>
+  )
 }

@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { getCurrent } from "@/features/auth/queries"
@@ -42,7 +43,9 @@ export default async function ProjectIdPage({ params }: ProjectIdPageProps) {
         </Link>
       </div>
 
-      <TaskViewSwitcher /> 
+      <Suspense fallback={null}>
+        <TaskViewSwitcher />
+      </Suspense>
     </div>
   )
 }
