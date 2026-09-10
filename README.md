@@ -84,7 +84,7 @@ pnpm install
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # Dowinnsys Backend API Base URL
-NEXT_PUBLIC_BACKEND_API_URL=https://your-dowinnsys-api-url.com
+Via discord
 ```
 ### 4. Run the Development Server
 ```bash
@@ -95,25 +95,17 @@ npm run dev
 🗄️ Database Initialization (Pre-defined Dataset)
 To bootstrap the backend database with sample projects, tasks across different statuses, and initial change logs, trigger the initialization endpoint:
 
-Via cURL / POST request:
-bash
-```
+Via cURL / POST request: sent via discord
 
-curl -X POST http://localhost:3000/api/init \
-  -H "Content-Type: application/json" \
-  -d '{"user_id": "demo_user", "email": "demo@example.com", "password": "Password123!"}'
-Or via Browser:
-Navigate directly to:
-
-http://localhost:3000/api/init
-```
 
 ## ⚠️ Known Issues & Technical Considerations
 First-Time Account Project Creation & Immediate Redirect:
 
 Behavior: When a brand-new user registers and creates their very first project, the project is created successfully on the backend, but the client may not immediately redirect to that specific project view until the user selects it from the switcher or refreshes the page.
+
 Cause: On newly provisioned accounts, the Dowinnsys backend assigns a numeric ID to the member record asynchronously in /test01/get_all_member. Because /test02/create_project accepts a string user_id while project listing filters against both string usernames and numeric IDs, the newly created project may take a moment to synchronize with the cache before the router can resolve the initial active project ID.
 Workaround: Selecting the project from the sidebar/switcher or refreshing the page immediately loads the new project and all associated tasks.
+
 No Backend Deletion Endpoints in Dowinnsys API:
 
 The provided Dowinnsys API does not expose delete_task or delete_project endpoints. To maintain data integrity with the backend, deletion options are omitted from the UI.
