@@ -14,7 +14,6 @@ const app = new Hono()
     async (c) => {
       const { projectId, status, search } = c.req.valid("query")
 
-      // get all tasks from dowinn API
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test03/get_all_task`,
         { cache: "no-store" }
@@ -27,7 +26,6 @@ const app = new Hono()
         ? result
         : []
 
-      // format task fields from backend
       let tasks: Task[] = allTasks.map((t: any) => ({
         id: t.id,
         name: t.name || t.title || "Untitled Task",
@@ -39,19 +37,16 @@ const app = new Hono()
         updated_at: t.updated_at
       }))
 
-      // filter by projectId
       if (projectId) {
         tasks = tasks.filter(
           (t) => String(t.projectId) === String(projectId)
         )
       }
 
-      // filter by status
       if (status) {
         tasks = tasks.filter((t) => t.status === status)
       }
 
-      // filter by search term
       if (search) {
         tasks = tasks.filter((t) =>
           t.name.toLowerCase().includes(search.toLowerCase())
@@ -67,7 +62,72 @@ const app = new Hono()
     }
   )
 
-  // get changelogs for a specific task (queries get_all_change_log filtered by task_id)
+  // get all changelogs for an entire project (Project History / Task Logs)
+  .get(
+    "/project/:projectId/changelogs",
+    sessionMiddleware,
+    async (c) => {
+      const { projectId } = c.req.param()
+      try {
+        // 1. Fetch tasks for this project to map task IDs to task names
+        const allTasksRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test03/get_all_task`,
+          { cache: "no-store" }
+        )
+        const allTasksJson = await allTasksRes.json().catch(() => null)
+        const allTasks = Array.isArray(allTasksJson?.data)
+          ? allTasksJson.data
+          : Array.isArray(allTasksJson)
+          ? allTasksJson
+          : []
+
+        const projectTasks = allTasks.filter(
+          (t: any) => String(t.project_id || t.projectId) === String(projectId)
+        )
+
+        const taskMap = new Map<string, string>()
+        projectTasks.forEach((t: any) => {
+          taskMap.set(String(t.id), t.name || t.title || `Task #${t.id}`)
+        })
+
+        const projectTaskIds = new Set(projectTasks.map((t: any) => String(t.id)))
+
+        // 2. Fetch all changelogs
+        const allLogsRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test04/get_all_change_log`,
+          { cache: "no-store" }
+        )
+        const allLogsJson = await allLogsRes.json().catch(() => null)
+        const allLogs = Array.isArray(allLogsJson?.data)
+          ? allLogsJson.data
+          : Array.isArray(allLogsJson)
+          ? allLogsJson
+          : []
+
+        // 3. Filter changelogs that belong to this project's tasks
+        const projectLogs = allLogs
+          .filter((l: any) => projectTaskIds.has(String(l.task_id || l.taskId)))
+          .map((l: any) => ({
+            ...l,
+            task_name: taskMap.get(String(l.task_id || l.taskId)) || `Task #${l.task_id || l.taskId}`
+          }))
+
+        // 4. Sort descending (most recent first)
+        projectLogs.sort((a: any, b: any) => {
+          const timeA = a.created_at ? new Date(a.created_at).getTime() : (Number(a.id) || 0)
+          const timeB = b.created_at ? new Date(b.created_at).getTime() : (Number(b.id) || 0)
+          return timeB - timeA
+        })
+
+        return c.json({ data: projectLogs })
+      } catch (err) {
+        console.error("Failed to fetch project changelogs:", err)
+        return c.json({ data: [] })
+      }
+    }
+  )
+
+  // get changelogs for a single task
   .get(
     "/:taskId/changelogs",
     sessionMiddleware,
@@ -76,7 +136,6 @@ const app = new Hono()
       try {
         let logs: any[] = []
 
-        // get all changelogs from Dowinnsys API
         const allLogsRes = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test04/get_all_change_log`,
           { cache: "no-store" }
@@ -90,7 +149,6 @@ const app = new Hono()
             ? allLogsJson
             : []
 
-          // filter records belonging to this task_id
           logs = allLogs.filter(
             (l: any) =>
               String(l.task_id) === String(taskId) ||
@@ -98,27 +156,6 @@ const app = new Hono()
           )
         }
 
-        // use  get_change_log?task_id if get_all_change_log was empty
-        if (logs.length === 0) {
-          try {
-            const fallbackRes = await fetch(
-              `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test04/get_change_log?task_id=${taskId}`,
-              { cache: "no-store" }
-            )
-            if (fallbackRes.ok) {
-              const fallbackJson = await fallbackRes.json().catch(() => null)
-              const rawData = fallbackJson?.data ?? fallbackJson
-              const candidateLogs = Array.isArray(rawData) ? rawData : rawData ? [rawData] : []
-              logs = candidateLogs.filter(
-                (l: any) => String(l.task_id || l.taskId) === String(taskId)
-              )
-            }
-          } catch {
-           // ignore error
-          }
-        }
-
-        // sort by descending to show changes
         logs.sort((a: any, b: any) => {
           const timeA = a.created_at ? new Date(a.created_at).getTime() : (Number(a.id) || 0)
           const timeB = b.created_at ? new Date(b.created_at).getTime() : (Number(b.id) || 0)
@@ -197,7 +234,6 @@ const app = new Hono()
     async (c) => {
       const { name, status, projectId, contents } = c.req.valid("json")
 
-      // format to dowinn
       const payload = {
         project_id: Number(projectId),
         name,
@@ -249,7 +285,6 @@ const app = new Hono()
       const { taskId } = c.req.param()
       let { name, status, contents } = c.req.valid("json")
 
-      // get all tasks to find existing task and its real current status
       let existingTask: any = null
       try {
         const allTasksRes = await fetch(
@@ -291,7 +326,6 @@ const app = new Hono()
       const currentContents = contents !== undefined ? contents : (existingTask?.contents || "")
       const newStatus = status || oldStatus
 
-      // patch task
       const payload = {
         task_id: Number(taskId),
         name: currentName,
@@ -314,7 +348,6 @@ const app = new Hono()
         return c.json({ error: errorText || "Failed to update task" }, 400)
       }
 
-      // 3. Create changelog if status actually transitioned
       if (oldStatus !== newStatus) {
         try {
           await fetch(

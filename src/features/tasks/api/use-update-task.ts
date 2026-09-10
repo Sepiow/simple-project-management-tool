@@ -14,7 +14,7 @@ export const useUpdateTask = () => {
       const response = await client.api.tasks[":taskId"]["$patch"]({
         param,
         json
-        })
+      })
 
       if (!response.ok) {
         throw new Error("Failed to update task")
@@ -26,10 +26,10 @@ export const useUpdateTask = () => {
       toast.success("Task updated")
       queryClient.invalidateQueries({ queryKey: ["tasks"] })
       queryClient.invalidateQueries({ queryKey: ["task", data.id] })
-      // need this to make update changelogs live
       queryClient.invalidateQueries({ queryKey: ["task", String(data.id)] })
       queryClient.invalidateQueries({ queryKey: ["task-changelogs"] })
       queryClient.invalidateQueries({ queryKey: ["task-changelogs", String(data.id)] })
+      queryClient.invalidateQueries({ queryKey: ["project-changelogs"] })
     },
     onError: () => {
       toast.error("Failed to update task")
