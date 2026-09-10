@@ -8,7 +8,7 @@ This application provides a workspace where teams can manage multi-project workf
 
 ## 🚀 Live Demo & Deployed Version
 
-- **Deployed URL (Vercel)**:
+- **Deployed URL (Vercel)**: [https://simple-project-management-tool-beryl.vercel.app/sign-up)](https://simple-project-management-tool-beryl.vercel.app/sign-up)
 - **Default Test User**:
   - **User ID**: `demo_user`
   - **Password**: `Password123!`
@@ -70,7 +70,7 @@ This application provides a workspace where teams can manage multi-project workf
 ```bash
 git clone https://github.com/your-username/simple-project-management-tool.git
 cd simple-project-management-tool
-
+```
 ### 2. Install Dependencies
 ```bash
 npm install
@@ -78,7 +78,7 @@ npm install
 yarn install
 # or
 pnpm install
-
+```
 ### 3. Setup Environment Variables
 - ** Create a .env.local file
 ```env
@@ -87,11 +87,11 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # Dowinnsys Backend API Base URL
 NEXT_PUBLIC_BACKEND_API_URL=https://your-dowinnsys-api-url.com
-
+```
 ### 4. Run the Development Server
 ```bash
 npm run dev
-
+```
 - ** Open http://localhost:3000 in your browser to view the application.
 
 🗄️ Database Initialization (Pre-defined Dataset)
