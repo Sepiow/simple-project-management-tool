@@ -10,11 +10,13 @@ import { Field, FieldError } from "@/components/ui/field";
 import Link from "next/link";
 import { loginSchema } from "../schemas";
 import { useLogin } from "../api/use-login";
-
+import { useState } from "react";
+import {Eye, EyeOff} from "lucide-react"
 
 export const SignInCard = () => {
-  
-  const {mutate} = useLogin()
+
+  const [showPassword, setShowPassword] = useState(false)
+  const { mutate, isPending } = useLogin()
   
   const {
     register,
@@ -59,13 +61,26 @@ export const SignInCard = () => {
           </Field>
 
           {/* Password Field */}
+          
           <Field data-invalid={!!errors.password}>
-            <Input
-              {...register("password")}
-              type="password"
-              placeholder="Enter Password"
-              aria-invalid={!!errors.password}
-            />
+            <div className="relative w-full flex items-center">
+              <Input
+                {...register("password")}
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter Password"
+                aria-invalid={!!errors.password}
+                disabled={isPending}
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-0 top-0 bottom-0 px-3 flex items-center justify-center text-neutral-500 hover:text-neutral-800 transition cursor-pointer z-10"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="size-4 shrink-0" /> : <Eye className="size-4 shrink-0" />}
+              </button>
+            </div>
             {errors.password?.message && (
               <FieldError>{errors.password.message}</FieldError>
             )}

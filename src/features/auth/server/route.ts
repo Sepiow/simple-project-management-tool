@@ -95,14 +95,18 @@ const app = new Hono()
       return c.json({ success: true });
     }
   )
-    // update user profile & password
+    // update user email & password
   .patch(
     "/update-member",
     sessionMiddleware,
     zValidator("json", updateMemberSchema),
     async (c) => {
       const { user_id, email, old_password, new_password } = c.req.valid("json");
-
+      // if no new password keep current password
+      const effectiveNewPassword =
+        new_password && new_password.trim().length > 0
+          ? new_password
+          : old_password;
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/test01/update_member`,
         {
@@ -112,18 +116,16 @@ const app = new Hono()
             user_id,
             email,
             old_password,
-            new_password,
+            new_password: effectiveNewPassword,
           }),
         }
       );
-
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Dowinnsys update_member error:", response.status, errorText);
-        return c.json({ error: errorText || "Failed to update profile" }, 400);
+        return c.json({ error: errorText || "Failed to update profile. Please verify your current password." }, 400);
       }
-
-      // update session cookie with the latest email
+      // update cookie with the latest email
       setCookie(c, AUTH_COOKIE, JSON.stringify({ user_id, email }), {
         path: "/",
         httpOnly: true,
@@ -131,7 +133,6 @@ const app = new Hono()
         sameSite: "strict",
         maxAge: 60 * 60 * 24 * 7,
       });
-
       return c.json({ success: true, data: { user_id, email } });
     }
   )

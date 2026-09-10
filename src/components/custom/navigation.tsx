@@ -9,24 +9,14 @@ const routes = [
         icon: GoHome,
         activeIcon: GoHomeFill
     },
-    {
-        label: 'My Tasks',
-        href: '/tasks',
-        icon: GoCheckCircle,
-        activeIcon: GoCheckCircleFill
-    },
+    
     {
         label: 'Settings',
         href: '/settings',
         icon: SettingsIcon,
         activeIcon: SettingsIcon
     },
-    {
-        label: 'Members',
-        href: '/members',
-        icon: UsersIcon,
-        activeIcon: UsersIcon
-    },
+    
 ]
 
 export const Navigation = () => {
