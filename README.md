@@ -422,7 +422,7 @@ Configure the following variables in the Vercel project settings:
 
 ```env
 NEXT_PUBLIC_APP_URL=https://your-production-domain.com
-NEXT_PUBLIC_BACKEND_API_URL=https://m-backend.dowinnsys.com
+NEXT_PUBLIC_BACKEND_API_URL= Sent via Discord
 ```
 
 > Production credentials and secrets should be configured through Vercel Environment Variables and should never be committed to the repository.
